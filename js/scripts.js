@@ -1,23 +1,8 @@
 //pokedex array
 //pokemon repository variable to hold the IIFE return
 let pokemonRepository = (function () {
-    let pokemonList = [
-        {
-            name:"Golem",
-            height: 1.5,
-            type:["rock", "ground"]
-        },
-        {
-            name:"Nidoking",
-            height: 1.4,
-            type: ["ground", "poison"]
-        },
-        {
-            name:"Wigglypuff",
-            height: 1, 
-            type: ["fairy", "normal"]
-        }
-    ];
+    let pokemonList = [];
+    let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
 //function to add a single item to the pokemonList
     function add(pokemon) {
@@ -50,15 +35,53 @@ let pokemonRepository = (function () {
 
     }
 
-//function to show details using parameter: pokemon
-    function showDetails(pokemon) {
-        console.log(pokemon.name)
+
+
+// The LoadList() method will fetch data from the API, then add each Pokémon in the fetched data to pokemonList with the add function
+    
+    function loadList() {
+        return fetch(apiUrl).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            json.results.forEach(function (item) {
+                let pokemon = {
+                    name: item.name,
+                    detailsUrl: item.url
+                };
+                add(pokemon);
+            });
+        }).catch(function (e) {
+            console.error(e);
+        })
     }
 
+    function loadDetails(item) {
+        let url = item.detailsUrl;
+        return fetch(url).then(function (response) {
+          return response.json();
+        }).then(function (details) {
+          // Now we add the details to the item
+          item.imageUrl = details.sprites.front_default;
+          item.height = details.height;
+          item.types = details.types;
+        }).catch(function (e) {
+          console.error(e);
+        });
+    }
+
+//function to show details using parameter: pokemon
+    function showDetails(pokemon) {
+        loadDetails(pokemon).then(function () {
+            console.log(pokemon);
+        });
+    }
+    
     return {
         add: add,
         getAll: getAll,
         addListItem: addListItem,
+        loadList: loadList,
+        loadDetails: loadDetails,
         showDetails: showDetails
     };
 })();
@@ -66,8 +89,12 @@ let pokemonRepository = (function () {
 //forEach method to iterate through and write pokemon
 console.log(pokemonRepository.getAll());
 
-pokemonRepository.getAll().forEach(function (pokemon) {
-  pokemonRepository.addListItem(pokemon);
+// Loading the data
+pokemonRepository.loadList().then(function() {
+    
+    pokemonRepository.getAll().forEach(function(pokemon){
+        pokemonRepository.addListItem(pokemon);
+    });
 });
 
 
