@@ -93,8 +93,8 @@ let pokemonRepository = (function () {
 
         let pokemonImage = document.createElement('img')
         pokemonImage.setAttribute('src', img);
-        pokemonImage.setAttribute('width', '100%');
-        pokemonImage.setAttribute('height', '100%');
+        pokemonImage.setAttribute('width', '10%');
+        pokemonImage.setAttribute('height', '10%');
       
         modal.appendChild(closeButtonElement);
         modal.appendChild(pokemonName);
