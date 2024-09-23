@@ -74,48 +74,14 @@ let pokemonRepository = (function () {
     }
 
     function showModal(title, text, img) {
-        let modalContainer = document.querySelector('#modal-container');
-      
-        // Clear all existing modal content
-        modalContainer.innerHTML = '';
-      
-        let modal = document.createElement('div');
-        modal.classList.add('modal');
-      
-        // Add the new modal content
-        let closeButtonElement = document.createElement('button');
-        closeButtonElement.classList.add('modal-close');
-        closeButtonElement.innerText = 'Close';
-        closeButtonElement.addEventListener('click', hideModal);
-      
-        let pokemonName = document.createElement('h1');
-        pokemonName.innerText = title;
+        let modalTitle = document.querySelector("#pokemonModalLabel");
+        let modalBody = document.querySelector(".modal-body");
+        let pokemonHeight = document.querySelector("#pokemonHeight");
+        let pokemonImage = document.querySelector("#pokemonImage");
     
-        let pokemonHeight = document.createElement('p');
+        modalTitle.innerText = title;
         pokemonHeight.innerText = text;
-
-        let pokemonImage = document.createElement('img')
         pokemonImage.setAttribute('src', img);
-        pokemonImage.setAttribute('width', '10%');
-        pokemonImage.setAttribute('height', '10%');
-      
-        modal.appendChild(closeButtonElement);
-        modal.appendChild(pokemonName);
-        modal.appendChild(pokemonHeight);
-        modal.appendChild(pokemonImage);
-        modalContainer.appendChild(modal);
-      
-        modalContainer.classList.add('is-visible');
-    
-        modalContainer.addEventListener('click', (e) => {
-          // Since this is also triggered when clicking INSIDE the modal
-          // We only want to close if the user clicks directly on the overlay
-            let target = e.target;
-            if (target === modalContainer) {
-                hideModal();
-            }
-        });
-    
     }
     
     function hideModal() {
@@ -138,7 +104,8 @@ let pokemonRepository = (function () {
                 pokemon.name,
                 "Height: " + pokemon.height,
                 pokemon.imageUrl
-            );   
+            ); 
+            document.querySelectorAll("pokemonModal").modal('show'); 
         });
     }
     
