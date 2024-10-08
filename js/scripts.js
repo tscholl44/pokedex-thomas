@@ -6,6 +6,7 @@ let pokemonRepository = (function () {
     
 
 //function to add a single item to the pokemonList
+
     function add(pokemon) {
         // check if the parameter is an object and not null
         if (typeof pokemon === "object" && pokemon !== null) {
@@ -16,11 +17,13 @@ let pokemonRepository = (function () {
     }
 
 //function to return all items 
+
     function getAll() {
         return pokemonList;
     }
 
 //function to add pokemon to the pokemon list as a list item
+
     function addListItem(pokemon) {
         let pokedex = document.querySelector(".pokemon-list");
         let pokedexItem = document.createElement("li");
@@ -41,7 +44,7 @@ let pokemonRepository = (function () {
 
 
 
-// The LoadList() method will fetch data from the API, then add each Pokémon in the fetched data to pokemonList with the add function
+//the LoadList() method will fetch data from the API, then add each Pokémon in the fetched data to pokemonList with the add function
     
     function loadList() {
         return fetch(apiUrl).then(function (response) {
@@ -59,6 +62,8 @@ let pokemonRepository = (function () {
         })
     }
 
+//the loadDetails() function takes in item and fetches the appropriate pokemon details 
+
     function loadDetails(item) {
         let url = item.detailsUrl;
         return fetch(url).then(function (response) {
@@ -73,6 +78,8 @@ let pokemonRepository = (function () {
         });
     }
 
+//the showModal function takes in the elements I want to include in the modal
+
     function showModal(title, text, img) {
         let modalTitle = document.querySelector("#pokemonModalLabel");
         let pokemonHeight = document.querySelector("#pokemonHeight");
@@ -85,6 +92,7 @@ let pokemonRepository = (function () {
     
 
 //function to show details using parameter: pokemon
+
     function showDetails(pokemon) {
         pokemonRepository.loadDetails(pokemon).then(function () {
             showModal(
@@ -105,7 +113,8 @@ let pokemonRepository = (function () {
     };
 })();
 
-// Loading the data
+//loading the data
+
 pokemonRepository.loadList().then(function() {
     
     pokemonRepository.getAll().forEach(function(pokemon){
