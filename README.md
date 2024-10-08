@@ -22,4 +22,7 @@ JQuery: https://code.jquery.com/jquery-3.3.1.min.js
 Popperjs: https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js
 Promise polyfill: js/promise-polyfill.js
 Fetch polyfill: js/fetch-polyfill.js
- 
+
+## Links 
+Live app: https://tscholl44.github.io/pokedex-thomas/
+GitHub Repo: https://github.com/tscholl44/pokedex-thomas
