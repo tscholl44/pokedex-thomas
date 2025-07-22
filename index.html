@@ -30,10 +30,25 @@
             </button>
           </div>
           <div class="modal-body">
-            <img id="pokemonImage" src="#" alt="Image of Pokemon" class="img-fluid">
-            <p id="pokemonHeight">
-              
-            </p>
+            <img id="pokemonImage" src="#" alt="Image of Pokemon" class="pokemon-modal-image">
+            <div id="pokemonDetails">
+              <div class="pokemon-detail">
+                <strong>Height:</strong> <span id="pokemonHeight"></span>
+              </div>
+              <div class="pokemon-detail">
+                <strong>Weight:</strong> <span id="pokemonWeight"></span>
+              </div>
+              <div class="pokemon-detail">
+                <strong>Types:</strong>
+                <div id="pokemonTypes" class="pokemon-types"></div>
+              </div>
+              <div class="pokemon-detail">
+                <strong>Abilities:</strong> <span id="pokemonAbilities"></span>
+              </div>
+              <div class="pokemon-detail">
+                <strong>Base Experience:</strong> <span id="pokemonExperience"></span>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
