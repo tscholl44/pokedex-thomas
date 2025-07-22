@@ -7,14 +7,40 @@ body {
     padding: 0;
 }
 
-/* Title Container */
-.title-container {
+/* Banner Image Container */
+.banner-container {
     text-align: center !important;
     margin: 2rem 0 !important;
+    padding: 0 20px;
 }
 
-/* 8-bit Game Boy Style Title */
-body h1 {
+/* Banner Image Styling */
+.banner-image {
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 200px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    border-radius: 10px !important;
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.2),
+        0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.banner-image:hover {
+    transform: scale(1.02) !important;
+    box-shadow: 
+        0 12px 35px rgba(0, 0, 0, 0.25),
+        0 6px 15px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Error handling for missing banner */
+.banner-image.error {
+    display: none !important;
+}
+
+.banner-fallback {
     color: #0f380f !important;
     font-family: 'Courier New', monospace !important;
     font-size: 2.5rem !important;
@@ -288,10 +314,18 @@ body h1 {
         padding: 10px;
     }
     
-    h1 {
-        font-size: 1.8rem;
-        margin: 1rem 0;
-        padding: 15px 25px;
+    .banner-container {
+        margin: 1rem 0 !important;
+        padding: 0 10px;
+    }
+    
+    .banner-image {
+        max-height: 150px !important;
+    }
+    
+    .banner-fallback {
+        font-size: 1.8rem !important;
+        padding: 15px 25px !important;
     }
     
     .search-container {
@@ -313,8 +347,12 @@ body h1 {
         grid-template-columns: 1fr;
     }
     
-    h1 {
-        font-size: 1.5rem;
-        padding: 10px 20px;
+    .banner-image {
+        max-height: 120px !important;
+    }
+    
+    .banner-fallback {
+        font-size: 1.5rem !important;
+        padding: 10px 20px !important;
     }
 }
