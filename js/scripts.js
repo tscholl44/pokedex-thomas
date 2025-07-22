@@ -25,7 +25,10 @@ let pokemonRepository = (function () {
 //function to add pokemon to the pokemon list as a list item
 
     function addListItem(pokemon) {
+        console.log("Creating card for:", pokemon.name);
         let pokedex = document.querySelector(".pokemon-list");
+        console.log("Found pokemon-list element:", pokedex);
+        
         let pokedexItem = document.createElement("li");
         pokedexItem.classList.add("pokemon-card");
         
@@ -57,8 +60,11 @@ let pokemonRepository = (function () {
         pokedexItem.appendChild(cardContent);
         pokedex.appendChild(pokedexItem);
         
+        console.log("Card created and added to DOM for:", pokemon.name);
+        
         // Load the pokemon image after adding to DOM
-        loadBasicDetails(pokemon).then(function() {
+        pokemonRepository.loadBasicDetails(pokemon).then(function() {
+            console.log("Basic details loaded for:", pokemon.name, "Image URL:", pokemon.imageUrl);
             if (pokemon.imageUrl) {
                 let image = document.createElement("img");
                 image.src = pokemon.imageUrl;
@@ -68,7 +74,12 @@ let pokemonRepository = (function () {
                     imageContainer.textContent = "No Image";
                 };
                 imageContainer.replaceWith(image);
+            } else {
+                imageContainer.textContent = "No Image Available";
             }
+        }).catch(function(error) {
+            console.error("Error loading image for", pokemon.name, error);
+            imageContainer.textContent = "Image Error";
         });
         
         //add an event listener for clicking a button
@@ -145,27 +156,31 @@ let pokemonRepository = (function () {
     
         modalTitle.textContent = pokemon.name;
         pokemonImage.src = pokemon.imageUrl || '';
-        pokemonHeight.textContent = (pokemon.height / 10) + " m"; // Convert to meters
-        pokemonWeight.textContent = (pokemon.weight / 10) + " kg"; // Convert to kilograms
+        pokemonHeight.textContent = pokemon.height ? (pokemon.height / 10) + " m" : "Unknown"; // Convert to meters
+        pokemonWeight.textContent = pokemon.weight ? (pokemon.weight / 10) + " kg" : "Unknown"; // Convert to kilograms
         pokemonExperience.textContent = pokemon.baseExperience || "Unknown";
         
         // Display types
         pokemonTypes.innerHTML = '';
-        if (pokemon.types) {
+        if (pokemon.types && pokemon.types.length > 0) {
             pokemon.types.forEach(function(typeInfo) {
                 let typeSpan = document.createElement("span");
                 typeSpan.classList.add("pokemon-type");
                 typeSpan.textContent = typeInfo.type.name;
                 pokemonTypes.appendChild(typeSpan);
             });
+        } else {
+            pokemonTypes.textContent = "Unknown";
         }
         
         // Display abilities
-        if (pokemon.abilities) {
+        if (pokemon.abilities && pokemon.abilities.length > 0) {
             let abilityNames = pokemon.abilities.map(function(abilityInfo) {
                 return abilityInfo.ability.name;
             });
             pokemonAbilities.textContent = abilityNames.join(", ");
+        } else {
+            pokemonAbilities.textContent = "Unknown";
         }
     }
     
@@ -192,8 +207,9 @@ let pokemonRepository = (function () {
 //loading the data
 
 pokemonRepository.loadList().then(function() {
-    
+    console.log("Pokemon list loaded:", pokemonRepository.getAll().length, "pokemon");
     pokemonRepository.getAll().forEach(function(pokemon){
+        console.log("Adding pokemon:", pokemon.name);
         pokemonRepository.addListItem(pokemon);
     });
 });
