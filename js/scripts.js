@@ -381,6 +381,9 @@ let pokemonRepository = (function () {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, starting Pokemon loading...");
     
+    // Setup banner image error handling
+    setupBannerImageHandling();
+    
     pokemonRepository.loadList().then(function() {
         console.log("Pokemon list loaded:", pokemonRepository.getAll().length, "pokemon");
         
@@ -402,6 +405,33 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Search setup completed!");
     });
 });
+
+// Function to handle banner image loading and fallback
+function setupBannerImageHandling() {
+    let bannerImage = document.getElementById('bannerImage');
+    let bannerContainer = document.querySelector('.banner-container');
+    
+    if (bannerImage && bannerContainer) {
+        bannerImage.onerror = function() {
+            console.log("Banner image failed to load, showing fallback text");
+            
+            // Hide the broken image
+            bannerImage.classList.add('error');
+            
+            // Create fallback text element
+            let fallbackTitle = document.createElement('div');
+            fallbackTitle.classList.add('banner-fallback');
+            fallbackTitle.textContent = 'Pokemonics';
+            
+            // Replace image with fallback
+            bannerContainer.appendChild(fallbackTitle);
+        };
+        
+        bannerImage.onload = function() {
+            console.log("Banner image loaded successfully");
+        };
+    }
+}
 
 
 
