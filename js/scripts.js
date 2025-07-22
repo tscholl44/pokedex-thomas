@@ -27,19 +27,54 @@ let pokemonRepository = (function () {
     function addListItem(pokemon) {
         let pokedex = document.querySelector(".pokemon-list");
         let pokedexItem = document.createElement("li");
-        pokedexItem.classList.add("list-group-item")
-        let button = document.createElement("button")
-        button.innerText = pokemon.name;
+        pokedexItem.classList.add("pokemon-card");
+        
+        // Create card content container
+        let cardContent = document.createElement("div");
+        cardContent.classList.add("pokemon-card-content");
+        
+        // Create image placeholder initially
+        let imageContainer = document.createElement("div");
+        imageContainer.classList.add("pokemon-image-placeholder");
+        imageContainer.textContent = "Loading...";
+        
+        // Create pokemon name
+        let pokemonName = document.createElement("h3");
+        pokemonName.classList.add("pokemon-name");
+        pokemonName.textContent = pokemon.name;
+        
+        // Create button
+        let button = document.createElement("button");
+        button.textContent = "View Details";
         button.setAttribute("data-toggle", "modal");
         button.setAttribute("data-target", "#pokemonModal");
-        button.classList.add("btn", "btn-primary");
-        pokedexItem.appendChild(button);
+        button.classList.add("pokemon-button");
+        
+        // Assemble the card
+        cardContent.appendChild(imageContainer);
+        cardContent.appendChild(pokemonName);
+        cardContent.appendChild(button);
+        pokedexItem.appendChild(cardContent);
         pokedex.appendChild(pokedexItem);
+        
+        // Load the pokemon image after adding to DOM
+        loadBasicDetails(pokemon).then(function() {
+            if (pokemon.imageUrl) {
+                let image = document.createElement("img");
+                image.src = pokemon.imageUrl;
+                image.alt = pokemon.name;
+                image.classList.add("pokemon-image");
+                image.onerror = function() {
+                    imageContainer.textContent = "No Image";
+                };
+                imageContainer.replaceWith(image);
+            }
+        });
+        
         //add an event listener for clicking a button
         button.addEventListener('click', function () {
             showDetails(pokemon);
         });
-
     }
 
 
@@ -72,22 +107,66 @@ let pokemonRepository = (function () {
           // Now we add the details to the item
           item.imageUrl = details.sprites.front_default;
           item.height = details.height;
+          item.weight = details.weight;
           item.types = details.types;
+          item.abilities = details.abilities;
+          item.baseExperience = details.base_experience;
         }).catch(function (e) {
           console.error(e);
         });
     }
 
-//the showModal function takes in the elements I want to include in the modal
+    // Function to load basic details (just image) for card display
+    function loadBasicDetails(item) {
+        if (item.imageUrl) {
+            return Promise.resolve(); // Already loaded
+        }
+        
+        let url = item.detailsUrl;
+        return fetch(url).then(function (response) {
+          return response.json();
+        }).then(function (details) {
+          item.imageUrl = details.sprites.front_default;
+        }).catch(function (e) {
+          console.error(e);
+        });
+    }
 
-    function showModal(title, text, img) {
+//the showModal function takes in the pokemon object and displays detailed information
+
+    function showModal(pokemon) {
         let modalTitle = document.querySelector("#pokemonModalLabel");
-        let pokemonHeight = document.querySelector("#pokemonHeight");
         let pokemonImage = document.querySelector("#pokemonImage");
+        let pokemonHeight = document.querySelector("#pokemonHeight");
+        let pokemonWeight = document.querySelector("#pokemonWeight");
+        let pokemonTypes = document.querySelector("#pokemonTypes");
+        let pokemonAbilities = document.querySelector("#pokemonAbilities");
+        let pokemonExperience = document.querySelector("#pokemonExperience");
     
-        modalTitle.innerText = title;
-        pokemonHeight.innerText = text;
-        pokemonImage.setAttribute('src', img);
+        modalTitle.textContent = pokemon.name;
+        pokemonImage.src = pokemon.imageUrl || '';
+        pokemonHeight.textContent = (pokemon.height / 10) + " m"; // Convert to meters
+        pokemonWeight.textContent = (pokemon.weight / 10) + " kg"; // Convert to kilograms
+        pokemonExperience.textContent = pokemon.baseExperience || "Unknown";
+        
+        // Display types
+        pokemonTypes.innerHTML = '';
+        if (pokemon.types) {
+            pokemon.types.forEach(function(typeInfo) {
+                let typeSpan = document.createElement("span");
+                typeSpan.classList.add("pokemon-type");
+                typeSpan.textContent = typeInfo.type.name;
+                pokemonTypes.appendChild(typeSpan);
+            });
+        }
+        
+        // Display abilities
+        if (pokemon.abilities) {
+            let abilityNames = pokemon.abilities.map(function(abilityInfo) {
+                return abilityInfo.ability.name;
+            });
+            pokemonAbilities.textContent = abilityNames.join(", ");
+        }
     }
     
 
@@ -95,11 +174,7 @@ let pokemonRepository = (function () {
 
     function showDetails(pokemon) {
         pokemonRepository.loadDetails(pokemon).then(function () {
-            showModal(
-                pokemon.name,
-                "Height: " + pokemon.height,
-                pokemon.imageUrl
-            ); 
+            showModal(pokemon); 
         });
     }
     
@@ -109,6 +184,7 @@ let pokemonRepository = (function () {
         addListItem: addListItem,
         loadList: loadList,
         loadDetails: loadDetails,
+        loadBasicDetails: loadBasicDetails,
         showDetails: showDetails
     };
 })();
