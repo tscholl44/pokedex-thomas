@@ -239,10 +239,25 @@ let pokemonRepository = (function () {
     
     // Function to setup search functionality
     function setupSearch() {
+        console.log("Setting up search functionality...");
+        
         let searchInput = document.getElementById('pokemonSearch');
         let searchButton = document.getElementById('searchButton');
         let showAllButton = document.getElementById('showAllButton');
         let suggestionsContainer = document.getElementById('searchSuggestions');
+        
+        console.log("Search elements found:", {
+            searchInput: !!searchInput,
+            searchButton: !!searchButton,
+            showAllButton: !!showAllButton,
+            suggestionsContainer: !!suggestionsContainer
+        });
+        
+        if (!searchInput || !searchButton || !showAllButton || !suggestionsContainer) {
+            console.error("One or more search elements not found!");
+            return;
+        }
+        
         let selectedSuggestionIndex = -1;
         
         // Search input event listener
@@ -363,23 +378,29 @@ let pokemonRepository = (function () {
 
 //loading the data
 
-pokemonRepository.loadList().then(function() {
-    console.log("Pokemon list loaded:", pokemonRepository.getAll().length, "pokemon");
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, starting Pokemon loading...");
     
-    // Sort pokemon alphabetically
-    let allPokemon = pokemonRepository.getAll();
-    allPokemon.sort(function(a, b) {
-        return a.name.localeCompare(b.name);
+    pokemonRepository.loadList().then(function() {
+        console.log("Pokemon list loaded:", pokemonRepository.getAll().length, "pokemon");
+        
+        // Sort pokemon alphabetically
+        let allPokemon = pokemonRepository.getAll();
+        allPokemon.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        
+        // Display sorted pokemon
+        allPokemon.forEach(function(pokemon){
+            console.log("Adding pokemon:", pokemon.name);
+            pokemonRepository.addListItem(pokemon);
+        });
+        
+        // Setup search functionality after pokemon are loaded
+        console.log("About to setup search...");
+        pokemonRepository.setupSearch();
+        console.log("Search setup completed!");
     });
-    
-    // Display sorted pokemon
-    allPokemon.forEach(function(pokemon){
-        console.log("Adding pokemon:", pokemon.name);
-        pokemonRepository.addListItem(pokemon);
-    });
-    
-    // Setup search functionality after pokemon are loaded
-    pokemonRepository.setupSearch();
 });
 
 
