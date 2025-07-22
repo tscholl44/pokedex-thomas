@@ -193,6 +193,160 @@ let pokemonRepository = (function () {
         });
     }
     
+    // Function to filter and display pokemon
+    function filterPokemon(searchTerm) {
+        let filteredPokemon = pokemonList.filter(function(pokemon) {
+            return pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+        
+        // Clear current display
+        let pokemonListElement = document.querySelector(".pokemon-list");
+        pokemonListElement.innerHTML = '';
+        
+        // Display filtered pokemon
+        filteredPokemon.forEach(function(pokemon) {
+            addListItem(pokemon);
+        });
+        
+        return filteredPokemon;
+    }
+    
+    // Function to show all pokemon
+    function showAllPokemon() {
+        let pokemonListElement = document.querySelector(".pokemon-list");
+        pokemonListElement.innerHTML = '';
+        
+        pokemonList.forEach(function(pokemon) {
+            addListItem(pokemon);
+        });
+    }
+    
+    // Function to get suggestions
+    function getSuggestions(searchTerm) {
+        if (searchTerm.length < 1) {
+            return [];
+        }
+        
+        return pokemonList
+            .filter(function(pokemon) {
+                return pokemon.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+            })
+            .slice(0, 5) // Limit to 5 suggestions
+            .map(function(pokemon) {
+                return pokemon.name;
+            });
+    }
+    
+    // Function to setup search functionality
+    function setupSearch() {
+        let searchInput = document.getElementById('pokemonSearch');
+        let searchButton = document.getElementById('searchButton');
+        let showAllButton = document.getElementById('showAllButton');
+        let suggestionsContainer = document.getElementById('searchSuggestions');
+        let selectedSuggestionIndex = -1;
+        
+        // Search input event listener
+        searchInput.addEventListener('input', function() {
+            let searchTerm = this.value.trim();
+            
+            if (searchTerm.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            let suggestions = getSuggestions(searchTerm);
+            
+            if (suggestions.length > 0) {
+                suggestionsContainer.innerHTML = '';
+                suggestions.forEach(function(suggestion, index) {
+                    let suggestionElement = document.createElement('div');
+                    suggestionElement.classList.add('suggestion-item');
+                    suggestionElement.textContent = suggestion;
+                    
+                    suggestionElement.addEventListener('click', function() {
+                        searchInput.value = suggestion;
+                        suggestionsContainer.style.display = 'none';
+                        performSearch(suggestion);
+                    });
+                    
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+                suggestionsContainer.style.display = 'block';
+                selectedSuggestionIndex = -1;
+            } else {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+        
+        // Keyboard navigation for suggestions
+        searchInput.addEventListener('keydown', function(e) {
+            let suggestions = suggestionsContainer.querySelectorAll('.suggestion-item');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
+                updateSuggestionHighlight(suggestions);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+                updateSuggestionHighlight(suggestions);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+                    let selectedText = suggestions[selectedSuggestionIndex].textContent;
+                    searchInput.value = selectedText;
+                    suggestionsContainer.style.display = 'none';
+                    performSearch(selectedText);
+                } else {
+                    performSearch(searchInput.value.trim());
+                }
+            } else if (e.key === 'Escape') {
+                suggestionsContainer.style.display = 'none';
+                selectedSuggestionIndex = -1;
+            }
+        });
+        
+        function updateSuggestionHighlight(suggestions) {
+            suggestions.forEach(function(suggestion, index) {
+                if (index === selectedSuggestionIndex) {
+                    suggestion.classList.add('highlighted');
+                } else {
+                    suggestion.classList.remove('highlighted');
+                }
+            });
+        }
+        
+        function performSearch(searchTerm) {
+            if (searchTerm) {
+                let results = filterPokemon(searchTerm);
+                if (results.length === 0) {
+                    alert('No Pokémon found with that name. Try a different search term.');
+                }
+            }
+            suggestionsContainer.style.display = 'none';
+        }
+        
+        // Search button click
+        searchButton.addEventListener('click', function() {
+            let searchTerm = searchInput.value.trim();
+            performSearch(searchTerm);
+        });
+        
+        // Show all button click
+        showAllButton.addEventListener('click', function() {
+            searchInput.value = '';
+            showAllPokemon();
+            suggestionsContainer.style.display = 'none';
+        });
+        
+        // Click outside to hide suggestions
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
+
     return {
         add: add,
         getAll: getAll,
@@ -200,7 +354,10 @@ let pokemonRepository = (function () {
         loadList: loadList,
         loadDetails: loadDetails,
         loadBasicDetails: loadBasicDetails,
-        showDetails: showDetails
+        showDetails: showDetails,
+        filterPokemon: filterPokemon,
+        showAllPokemon: showAllPokemon,
+        setupSearch: setupSearch
     };
 })();
 
@@ -208,10 +365,21 @@ let pokemonRepository = (function () {
 
 pokemonRepository.loadList().then(function() {
     console.log("Pokemon list loaded:", pokemonRepository.getAll().length, "pokemon");
-    pokemonRepository.getAll().forEach(function(pokemon){
+    
+    // Sort pokemon alphabetically
+    let allPokemon = pokemonRepository.getAll();
+    allPokemon.sort(function(a, b) {
+        return a.name.localeCompare(b.name);
+    });
+    
+    // Display sorted pokemon
+    allPokemon.forEach(function(pokemon){
         console.log("Adding pokemon:", pokemon.name);
         pokemonRepository.addListItem(pokemon);
     });
+    
+    // Setup search functionality after pokemon are loaded
+    pokemonRepository.setupSearch();
 });
 
 
